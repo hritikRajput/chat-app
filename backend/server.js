@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
   res.send("Hello there!");
 });
 
-app.use("/api/auth", userRouter);
+app.use("/api/user", userRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to db");

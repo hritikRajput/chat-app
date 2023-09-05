@@ -73,4 +73,34 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const searchUsers = async (req, res) => {
+  try {
+    //check if req.query has search parameter
+    //if yes then use mongodb logical operator with regex to search for that and assign to keyword
+    //if no assign {} to keyword
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    // Using that keyword object find all the users with matching name and email
+    //Use mongodb comparison query operator to filter the user which have _id equal to current user's _id
+    //req.user._id is coming from requireAuth middleware
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+    users
+      ? res.status(200).json(users)
+      : res.status(404).json({ error: "No data found" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "An error occured while searching for user",
+      err,
+    });
+  }
+};
+
+module.exports = { registerUser, loginUser, searchUsers };
