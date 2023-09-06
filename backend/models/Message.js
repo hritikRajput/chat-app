@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
+const User = require("./User");
+const Chat = require("./Chat");
 const Schema = mongoose.Schema;
+
 const messageSchema = new Schema(
   {
     sender: {
@@ -14,7 +17,7 @@ const messageSchema = new Schema(
     chat: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: Chat,
+      ref: "Chat",
     },
     readBy: [
       {

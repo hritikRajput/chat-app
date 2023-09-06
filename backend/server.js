@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const db = require("./config/db");
 
 const userRouter = require("./routes/userRoutes");
+const chatRouter = require("./routes/chatRoutes");
 
 const app = express();
 db();
@@ -14,7 +15,10 @@ app.get("/", (req, res) => {
   res.send("Hello there!");
 });
 
+//api endpoint for user routes
 app.use("/api/user", userRouter);
+//api endpoint for chat routes
+app.use("/api/chat", chatRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to db");
