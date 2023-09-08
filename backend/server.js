@@ -6,6 +6,7 @@ const dummyData = require("./data/data");
 
 const userRouter = require("./routes/userRoutes");
 const chatRouter = require("./routes/chatRoutes");
+const messageRouter = require("./routes/messageRoutes");
 
 const app = express();
 db();
@@ -21,6 +22,8 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 //api endpoint for chat routes
 app.use("/api/chat", chatRouter);
+//api endpoint for message routes
+app.use("/api/message", messageRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to db");
