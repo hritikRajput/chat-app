@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const db = require("./config/db");
+const dummyData = require("./data/data");
 
 const userRouter = require("./routes/userRoutes");
 const chatRouter = require("./routes/chatRoutes");
@@ -12,7 +13,8 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 app.get("/", (req, res) => {
-  res.send("Hello there!");
+  // res.send("Hello there!");
+  res.json(dummyData);
 });
 
 //api endpoint for user routes

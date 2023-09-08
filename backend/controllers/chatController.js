@@ -75,4 +75,118 @@ const fetchChats = async (req, res) => {
   }
 };
 
-module.exports = { accessChat, fetchChats };
+const createGroupChat = async (req, res) => {
+  try {
+    const participants = JSON.parse(req.body.users);
+    const name = req.body.name;
+    if (!participants || !name) {
+      return res.status(400).json({
+        error: "Please fill all the fields",
+      });
+    }
+    if (participants.length < 2) {
+      return res.status(400).json({
+        error: "At least 2 users are required to create a group chat",
+      });
+    }
+    participants.push(req.user);
+    const groupChat = await Chat.create({
+      name: req.body.name,
+      participants: participants,
+      isGroupChat: true,
+      groupAdmin: req.user,
+    });
+
+    const fullGroupChat = await Chat.find({
+      _id: groupChat._id,
+    })
+      .populate("participants", "-password")
+      .populate("groupAdmin", "-password");
+
+    res.status(200).json(fullGroupChat);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error occurred while creating new group",
+      err,
+    });
+  }
+};
+
+const renameGroup = async (req, res) => {
+  try {
+    const { chatId, chatName } = req.body;
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        name: chatName,
+      },
+      { new: true }
+    )
+      .populate("participants", "-password")
+      .populate("groupAdmin", "-password");
+
+    updatedChat
+      ? res.status(200).json(updatedChat)
+      : res.status(404).json("Chat not found");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error occurred while renaming group",
+      err,
+    });
+  }
+};
+
+const addToGroup = async (req, res) => {
+  try {
+    const { chatId, userId } = req.body;
+    const groupModified = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $push: { participants: userId },
+      },
+      { new: true }
+    )
+      .populate("participants", "-password")
+      .populate("groupAdmin", "-password");
+    res.status(200).json(groupModified);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error occurred while adding to group",
+      err,
+    });
+  }
+};
+
+const removeFromGroup = async (req, res) => {
+  try {
+    const { chatId, userId } = req.body;
+    const groupModified = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $pull: { participants: userId },
+      },
+      { new: true }
+    )
+      .populate("participants", "-password")
+      .populate("groupAdmin", "-password");
+    res.status(200).json(groupModified);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error occurred while removing from group",
+      err,
+    });
+  }
+};
+
+module.exports = {
+  accessChat,
+  fetchChats,
+  createGroupChat,
+  renameGroup,
+  addToGroup,
+  removeFromGroup,
+};
