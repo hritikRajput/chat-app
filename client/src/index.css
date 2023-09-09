@@ -16,3 +16,7 @@ body{
   color: #eeeff6;
   font-family: 'Archivo', sans-serif;
 }
+
+input{
+  font-family: inherit;
+}
