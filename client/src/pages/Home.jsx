@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom"
+import { useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 
 const Home = () => {
+    const navigate = useNavigate()
+    useEffect(() => {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (userData) {
+            navigate("/chat")
+        }
+    }, [navigate])
+
     return (
         <div className="px-8">
             <div>
