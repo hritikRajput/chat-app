@@ -8,7 +8,6 @@ const ChatListItem = ({ chat }) => {
     const latestMessage = chat.latestMessage.length ? chat.latestMessage[0].content : "";
     const currentChat = useSelector(state => state.chat.currentChat)
     const dispatch = useDispatch();
-    console.log(currentChat, chatId)
 
     return (
         <div onClick={() => dispatch(setCurrentChat(chatId))} className={"border-solid border-orange-300 border-2 p-2 mb-2 flex " + (currentChat === chatId ? "bg-slate-gray" : "")}>

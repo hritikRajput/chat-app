@@ -1,18 +1,24 @@
 import { useDispatch, useSelector } from "react-redux"
 import Sidebar from "../components/Sidebar"
 import { loginSuccess } from "../../redux/slices/authSlice/authSlice"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { fetchChats } from "../../services/chatService"
+import { sendMessage } from "../../services/messageService"
 import { setChats } from "../../redux/slices/chatSlice/chatSlice"
+import { sendMessage as sendMessageReducer } from "../../redux/slices/messageSlice/messageSlice"
 
 const Chat = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  const [newMessageText, setNewMessageText] = useState("")
+
   const userState = useSelector(state => state.auth)
   const chatState = useSelector(state => state.chat)
-  console.log("userstate", userState)
+  const chatId = useSelector(state => state.chat.currentChat)
+  const token = userState.user?.token
+  console.log("token", token)
   console.log("chatstate", chatState)
 
 
@@ -36,6 +42,18 @@ const Chat = () => {
     fetchChatsData()
   }, [navigate, dispatch])
 
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (newMessageText) {
+      const message = { content: newMessageText, chatId }
+      const data = await sendMessage(message, token)
+      if (data) {
+        dispatch(sendMessageReducer(data));
+        setNewMessageText("")
+      }
+    }
+  }
+
   return (
     <div className="flex h-full p-8">
       <Sidebar />
@@ -43,8 +61,10 @@ const Chat = () => {
         <div>
           <h1 className="py-2 bg-slate-gray">CHAT NAME</h1>
         </div>
-        <form className="flex gap-2">
+        <form className="flex gap-2" onSubmit={handleSendMessage}>
           <input type="text"
+            value={newMessageText}
+            onChange={e => setNewMessageText(e.target.value)}
             placeholder="Type your message here"
             className="bg-slate-gray text-pearl-white flex-grow rounded-md p-4 outline-none" />
           <button type="submit" className="bg-royal-purple p-4 text-pearl-white rounded-lg">
