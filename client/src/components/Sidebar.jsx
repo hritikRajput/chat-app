@@ -3,7 +3,7 @@ import SearchBox from './SearchBox'
 
 const Sidebar = () => {
     return (
-        <div className='h-full px-4 basis-1/3'>
+        <div className='h-full basis-1/3'>
             <SearchBox />
             <div className='flex justify-between border-2 border-orange-300 boorder-solid mb-2 p-2'>
                 <h2>Messages</h2>

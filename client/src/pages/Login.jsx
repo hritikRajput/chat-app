@@ -2,12 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { authFailure, loginSuccess } from "../../redux/slices/authSlice/authSlice";
 import { logIn } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Login = () => {
     //get the dispatch function from redux
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
     //state to manage form data
     const [formData, setFormData] = useState({
@@ -32,7 +31,7 @@ const Login = () => {
         try {
             const data = await logIn(formData);
             if (data) {
-                dispatch(loginSuccess(data));
+                dispatch(loginSuccess(data.user));
                 localStorage.setItem('user', JSON.stringify(data.user))
                 navigate("/chat")
             }
