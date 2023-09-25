@@ -7,13 +7,18 @@ import { fetchChats } from "../../services/chatService"
 import { getAllMessages, sendMessage } from "../../services/messageService"
 import { addMessageToCurrentChat, setChats, setCurrentChat } from "../../redux/slices/chatSlice/chatSlice"
 import { sendMessage as sendMessageReducer } from "../../redux/slices/messageSlice/messageSlice"
+import { io } from "socket.io-client"
+import ChatHeader from "../components/ChatHeader"
+import Avatar from "../components/Avatar"
+const ENDPOINT = "http://localhost:8000";
+let socket, selectedChatCompare;
 
 const Chat = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const divUnderMessage = useRef();
   //state for newMessage input
   const [newMessageText, setNewMessageText] = useState("")
-  const divUnderMessage = useRef();
 
   //userState  in authSlice
   const userState = useSelector(state => state.auth)
@@ -29,6 +34,22 @@ const Chat = () => {
   console.log("token", token)
   console.log("chatstate", chatState)
   console.log("usersate", userState)
+
+  useEffect(() => {
+    socket = io(ENDPOINT);
+
+    if (userState.user) {
+      // emit a "setup" event to send user data to the server when the user is logged in
+      socket.emit("setup", userState.user);
+    }
+    // clean up the socket connection when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [userState.user]);
+
 
   //load chat page with list of all chats. If user is not logged in then navigate them to login page.
   useEffect(() => {
@@ -51,6 +72,8 @@ const Chat = () => {
     fetchChatsData()
   }, [navigate, dispatch])
 
+
+
   //handleSendMessage will be called when user will send a message. It will call sendMessage service from messageService and dispatch the sendMessageReducer to update the message state
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -59,6 +82,7 @@ const Chat = () => {
       const data = await sendMessage(message, token)
       if (data) {
         console.log(data);
+        socket.emit("new message", data);
         dispatch(sendMessageReducer(data));
         dispatch(addMessageToCurrentChat({ message: data }));
         setNewMessageText("")
@@ -66,16 +90,28 @@ const Chat = () => {
     }
   }
 
+  useEffect(() => {
+    socket.on("message received", async (newMessageReceived) => {
+      console.log("newMessageReceived: ", newMessageReceived)
+      const messages = await getAllMessages(chatId, token)
+      console.log("messages", messages)
+      dispatch(setCurrentChat({ messages, chatId, participants }))
+    });
+  });
+
   //load all messages of current chat. It will call getAllMessage from message service and update the currentChat in chatSlice.
   useEffect(() => {
-    if (chatId && token) {
-      const fetchMessages = async () => {
+    const fetchMessages = async () => {
+      if (chatId && token) {
         const messages = await getAllMessages(chatId, token)
         console.log("messages", messages)
         dispatch(setCurrentChat({ messages, chatId, participants }))
+        socket.emit("join room", chatId);
       }
-      fetchMessages();
+      return
     }
+    fetchMessages();
+    selectedChatCompare = chatId;
   }, [chatId, token])
 
   // automatically scroll to the latest message in a chat when new messages are added
@@ -86,29 +122,32 @@ const Chat = () => {
     }
   }, [messages]);
 
-
   return (
     <div className="flex h-full p-8">
       <Sidebar />
-      <main className="grow text-pearl-white flex flex-col justify-between px-8">
-        <div>
-          <h1 className="py-2 bg-slate-gray">CHAT NAME</h1>
+      {chatId && <main className="grow text-pearl-white flex flex-col justify-between px-8">
+        <div className="h-[90%]">
+          <ChatHeader />
           {/* render messages */}
-          <section className="h-[400px] overflow-y-scroll">
+          <section className=" overflow-y-scroll h-[80%] px-2">
             {messages && messages.map(message => {
               const messageContent = message.content;
               const sentBy = message.sender.name
+              const pic = message.sender.pic
               let isCurrentUser = false;
               if (userState.user._id === message.sender._id) {
                 isCurrentUser = true;
               }
               return (
-                <div key={message._id} className={`p-2 ${isCurrentUser ? "text-right" : ""}`}>
-                  <div className="">
-                    {`${sentBy}`}
-                  </div>
-                  <div className={`px-4 py-2 rounded-lg ${isCurrentUser ? "bg-royal-purple" : "bg-slate-gray"}`}>
-                    {`${messageContent}`}
+                <div key={message._id} className={`p-2 flex gap-2 ${isCurrentUser ? "flex-row-reverse" : ""}`}>
+                  <Avatar pic={pic} />
+                  <div>
+                    <div className="">
+                      {`${sentBy}`}
+                    </div>
+                    <div className={`px-4 py-2 rounded-lg ${isCurrentUser ? "bg-royal-purple" : "bg-slate-gray"}`}>
+                      {`${messageContent}`}
+                    </div>
                   </div>
                 </div>
               )
@@ -117,7 +156,7 @@ const Chat = () => {
           </section>
         </div>
         {/* show the form for sending message if a chat is selected as currentChat */}
-        {chatId && <form className="flex gap-2" onSubmit={handleSendMessage}>
+        <form className="flex gap-2" onSubmit={handleSendMessage}>
           <input type="text"
             value={newMessageText}
             onChange={e => setNewMessageText(e.target.value)}
@@ -128,9 +167,10 @@ const Chat = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
             </svg>
           </button>
-        </form>}
+        </form>
 
       </main>
+      }
     </div >
   )
 }

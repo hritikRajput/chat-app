@@ -6,7 +6,7 @@ const ChatList = () => {
     const chats = chatState.chats
     return (
         <div>
-            {chats.map(chat => <ChatListItem chat={chat} />)}
+            {chats.map(chat => <ChatListItem chat={chat} key={chat._id} />)}
         </div>
     )
 }
