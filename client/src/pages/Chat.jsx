@@ -23,7 +23,7 @@ const Chat = () => {
   //userState  in authSlice
   const userState = useSelector(state => state.auth)
   //chat state in chat Slice
-  const chatState = useSelector(state => state.chat)
+  // const chatState = useSelector(state => state.chat)
   //chatId, mesages, participants of current chat
   const chatId = useSelector(state => state.chat.currentChat.chatId)
   const messages = useSelector(state => state.chat.currentChat.messages);
@@ -32,8 +32,6 @@ const Chat = () => {
   const token = userState.user?.token
 
   console.log("token", token)
-  console.log("chatstate", chatState)
-  console.log("usersate", userState)
 
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -81,7 +79,6 @@ const Chat = () => {
       const message = { content: newMessageText, chatId }
       const data = await sendMessage(message, token)
       if (data) {
-        console.log(data);
         socket.emit("new message", data);
         dispatch(sendMessageReducer(data));
         dispatch(addMessageToCurrentChat({ message: data }));
@@ -91,10 +88,8 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    socket.on("message received", async (newMessageReceived) => {
-      console.log("newMessageReceived: ", newMessageReceived)
+    socket.on("message received", async () => {
       const messages = await getAllMessages(chatId, token)
-      console.log("messages", messages)
       dispatch(setCurrentChat({ messages, chatId, participants }))
     });
   });
@@ -104,7 +99,6 @@ const Chat = () => {
     const fetchMessages = async () => {
       if (chatId && token) {
         const messages = await getAllMessages(chatId, token)
-        console.log("messages", messages)
         dispatch(setCurrentChat({ messages, chatId, participants }))
         socket.emit("join room", chatId);
       }

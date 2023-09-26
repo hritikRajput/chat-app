@@ -78,6 +78,8 @@ const fetchChats = async (req, res) => {
 const createGroupChat = async (req, res) => {
   try {
     const participants = JSON.parse(req.body.users);
+    // console.log(req.body);
+    // const participants = req.body.users;
     const name = req.body.name;
     if (!participants || !name) {
       return res.status(400).json({

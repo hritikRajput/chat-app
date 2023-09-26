@@ -7,7 +7,7 @@ const ChatListItem = ({ chat }) => {
     const chatId = chat._id
     const participants = chat.participants
     const pic = chat.participants[1].pic;
-    const name = chat.participants.filter(participant => participant._id !== userId)[0].name
+    const name = chat.isGroupChat ? chat.name : chat.participants.filter(participant => participant._id !== userId)[0].name
     const latestMessage = chat.latestMessage.length ? chat.latestMessage[0].content : "";
     const currentChat = useSelector(state => state.chat.currentChat)
     const dispatch = useDispatch();
@@ -16,14 +16,14 @@ const ChatListItem = ({ chat }) => {
     }
 
     return (
-        <div onClick={handleClick} className={"border-solid border-orange-300 border-2 p-2 mb-2 cursor-pointer flex " + (currentChat.chatId === chatId ? "bg-slate-gray" : "")}>
+        <div onClick={handleClick} className={"p-2 mb-2 cursor-pointer flex " + (currentChat.chatId === chatId ? "bg-slate-gray rounded-md" : "")}>
             <Avatar pic={pic} />
-            <div className="flex flex-col flex-1 border-solid border-blue-300 border-2">
-                <div className="flex justify-between border-solid border-orange-300 border-2">
+            <div className="flex flex-col flex-1">
+                <div className="flex justify-between">
                     <p>{name}</p>
                     <p>Time</p>
                 </div>
-                <div className="flex justify-between border-solid border-orange-300 border-2">
+                <div className="flex justify-between">
                     <p className="">{latestMessage}</p>
                     <p>unread</p>
                 </div>

@@ -1,15 +1,28 @@
 import ChatList from './ChatList'
 import SearchBox from './SearchBox'
+import GroupChatModal from './GroupChatModal'
+import { useState } from 'react'
+import addGroup from "../assets/add-group.png"
 
 const Sidebar = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Handle modal opening
+    const handleModalOpen = () => {
+        setIsModalOpen(true);
+    };
+
     return (
         <div className='h-full basis-1/3'>
             <SearchBox />
-            <div className='flex justify-between border-2 border-orange-300 boorder-solid mb-2 p-2'>
-                <h2>Messages</h2>
-                <p>New</p>
+            <div className='flex justify-between items-center mb-2 p-2'>
+                <h2 className='font-bold text-slate-gray'>Messages</h2>
+                <div onClick={handleModalOpen} className='cursor-pointer w-[2rem] h-[2rem]'><img src={addGroup} alt="create new group" title="Create New Group" className='w-full h-full' /></div>
             </div>
-            <ChatList />
+            <div>
+                {isModalOpen && <GroupChatModal closeModal={() => setIsModalOpen(false)} />}
+                <ChatList />
+            </div>
         </div>
     )
 }

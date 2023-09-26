@@ -3,6 +3,7 @@ const User = require("../models/User");
 const requireAuth = async (req, res, next) => {
   //verify authentication
   const { authorization } = req.headers;
+  console.log("authorization", req.headers);
   if (!authorization)
     return res.status(401).json({
       error: "Authorization token required",
@@ -14,7 +15,7 @@ const requireAuth = async (req, res, next) => {
     req.user = await User.findOne({ _id }).select("_id");
     next();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(401).json({ error: "Request is not authorized" });
   }
 };

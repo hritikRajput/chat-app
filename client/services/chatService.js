@@ -13,5 +13,22 @@ const fetchChats = async (token) => {
     return err;
   }
 };
+const createGroup = async ({ name, users }, token) => {
+  try {
+    const { data } = await axios.post(
+      `${BASE_URL}api/chat/group`,
+      { name, users },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return data;
+  } catch (err) {
+    console.error("Error in creating group", err);
+    return err;
+  }
+};
 
-export { fetchChats };
+export { fetchChats, createGroup };

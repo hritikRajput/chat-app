@@ -20,4 +20,18 @@ const logIn = async (formData) => {
   }
 };
 
-export { register, logIn };
+const searchUsers = async (search, token) => {
+  try {
+    const { data } = await axios.get(`${BASE_URL}api/user?search=${search}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return data;
+  } catch (err) {
+    console.error("Error in searching in", err);
+    return err;
+  }
+};
+
+export { register, logIn, searchUsers };
