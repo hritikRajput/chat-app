@@ -119,52 +119,57 @@ const Chat = () => {
   return (
     <div className="flex h-full p-8">
       <Sidebar />
-      {chatId && <main className="grow text-pearl-white flex flex-col justify-between px-8">
-        <div className="h-[90%]">
-          <ChatHeader />
-          {/* render messages */}
-          <section className=" overflow-y-scroll h-[80%] px-2">
-            {messages && messages.map(message => {
-              const messageContent = message.content;
-              const sentBy = message.sender.name
-              const pic = message.sender.pic
-              let isCurrentUser = false;
-              if (userState.user._id === message.sender._id) {
-                isCurrentUser = true;
-              }
-              return (
-                <div key={message._id} className={`p-2 flex gap-2 ${isCurrentUser ? "flex-row-reverse" : ""}`}>
-                  <Avatar pic={pic} />
-                  <div>
-                    <div className="">
-                      {`${sentBy}`}
+      <main className="grow flex text-pearl-white px-8">
+        {chatId ?
+          <div className="grow flex flex-col justify-between">
+            <div className="h-[90%]">
+              <ChatHeader />
+              {/* render messages */}
+              <section className=" overflow-y-scroll h-[80%] px-2">
+                {messages && messages.map(message => {
+                  const messageContent = message.content;
+                  const sentBy = message.sender.name
+                  const pic = message.sender.pic
+                  let isCurrentUser = false;
+                  if (userState.user._id === message.sender._id) {
+                    isCurrentUser = true;
+                  }
+                  return (
+                    <div key={message._id} className={`p-2 flex gap-2 ${isCurrentUser ? "flex-row-reverse" : ""}`}>
+                      <Avatar pic={pic} />
+                      <div>
+                        <div className="">
+                          {`${sentBy}`}
+                        </div>
+                        <div className={`px-4 py-2 rounded-lg ${isCurrentUser ? "bg-royal-purple" : "bg-slate-gray"}`}>
+                          {`${messageContent}`}
+                        </div>
+                      </div>
                     </div>
-                    <div className={`px-4 py-2 rounded-lg ${isCurrentUser ? "bg-royal-purple" : "bg-slate-gray"}`}>
-                      {`${messageContent}`}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-            <div ref={divUnderMessage}></div>
-          </section>
-        </div>
-        {/* show the form for sending message if a chat is selected as currentChat */}
-        <form className="flex gap-2" onSubmit={handleSendMessage}>
-          <input type="text"
-            value={newMessageText}
-            onChange={e => setNewMessageText(e.target.value)}
-            placeholder="Type your message here"
-            className="bg-slate-gray text-pearl-white flex-grow rounded-md p-4 outline-none" />
-          <button type="submit" className="bg-royal-purple p-4 text-pearl-white rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-            </svg>
-          </button>
-        </form>
-
+                  )
+                })}
+                <div ref={divUnderMessage}></div>
+              </section>
+            </div>
+            {/* show the form for sending message if a chat is selected as currentChat */}
+            <form className="flex gap-2" onSubmit={handleSendMessage}>
+              <input type="text"
+                value={newMessageText}
+                onChange={e => setNewMessageText(e.target.value)}
+                placeholder="Type your message here"
+                className="bg-slate-gray text-pearl-white flex-grow rounded-md p-4 outline-none" />
+              <button type="submit" className="bg-royal-purple p-4 text-pearl-white rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+              </button>
+            </form>
+          </div> :
+          <h3 className="text-slate-gray text-3xl font-bold self-center mx-auto">
+            Select a chat or start a new conversation
+          </h3>
+        }
       </main>
-      }
     </div >
   )
 }
