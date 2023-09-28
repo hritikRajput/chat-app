@@ -20,11 +20,11 @@ const ChatListItem = ({ chat }) => {
             <Avatar pic={pic} />
             <div className="flex flex-col flex-1">
                 <div className="flex justify-between">
-                    <p>{name}</p>
+                    <p className="font-bold">{name}</p>
                     <p>Time</p>
                 </div>
                 <div className="flex justify-between">
-                    <p className="">{latestMessage}</p>
+                    <p className="text-sm">{latestMessage}</p>
                     <p>unread</p>
                 </div>
             </div>

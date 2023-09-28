@@ -58,6 +58,7 @@ const Chat = () => {
           dispatch(loginSuccess(userData));
           const token = userData.token;
           const chats = await fetchChats(token);
+          console.log("chats", chats)
           dispatch(setChats(chats))
         }
         else {
@@ -106,7 +107,7 @@ const Chat = () => {
     }
     fetchMessages();
     selectedChatCompare = chatId;
-  }, [chatId, token])
+  }, [chatId, token, dispatch, participants])
 
   // automatically scroll to the latest message in a chat when new messages are added
   useEffect(() => {

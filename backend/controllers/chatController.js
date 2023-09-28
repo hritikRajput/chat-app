@@ -4,7 +4,7 @@ const accessChat = async (req, res) => {
   try {
     const { userId } = req.body;
     if (!userId) {
-      res.status(400).json({
+      return res.status(400).json({
         error: "Missing userId in the request body",
       });
     }
